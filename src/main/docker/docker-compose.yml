@@ -1,0 +1,36 @@
+version: '3'
+services:
+
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+
+  mysql:
+    container_name: mysql
+    image: mysql/mysql-server:latest
+    environment:
+      MYSQL_DATABASE: greenland
+      MYSQL_ROOT_PASSWORD: greenland
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+    restart: always
+
+  web:
+    container_name: greenland
+    build: .
+    ports:
+      - "8081:8081"
+    expose:
+      - 8081
+    links:
+      - mysql
+      - redis
+    depends_on:
+      - mysql
+      - redis
+    command: mvn clean spring-boot:run -Dspring-boot.run.profiles=docker
